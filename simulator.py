@@ -17,7 +17,9 @@
  
 
 import marimo
+import micropip
 
+await micropip.install(["plotly", "pandas"])   
  
 
 __generated_with = "0.23.4"
