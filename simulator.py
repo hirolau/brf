@@ -1,39 +1,20 @@
 # /// script
-
 # dependencies = [
-
 #     "marimo",
-
 #     "pandas==3.0.2",
-
 #     "plotly==6.7.0",
-
 # ]
-
 # requires-python = ">=3.13"
-
 # ///
 
- 
-
 import marimo
-import micropip
-
-await micropip.install(["plotly", "pandas"])   
- 
 
 __generated_with = "0.23.4"
-
 app = marimo.App(width="full")
 
- 
-
- 
 
 @app.cell
-
 def _():
-
     import marimo as mo
 
     import pandas as pd
@@ -42,44 +23,31 @@ def _():
 
     import plotly.graph_objects as go
 
- 
+
 
     return go, mo, pd, px
 
- 
-
- 
 
 @app.cell
-
 def _(mo):
-
     mo.md("""
-
     # Ekonomisk Simulator 2025–2035
 
- 
+
 
     Simulera effekten av tomträttsavgäldsförändringen 2030 och andra ekonomiska beslut.
 
- 
+
 
     **Bakgrund:** Tomträttsavgäldsperioden löper t.o.m. 2030-04-30 och omförhandlas därefter.
 
     Vid omförhandling tillämpas vanligen en 5-årig upptrappning ("stege") till den nya nivån.
-
     """)
-
     return
 
- 
-
- 
 
 @app.cell
-
 def _(mo):
-
     # Sliders
 
     fee_change_slider = mo.ui.slider(
@@ -146,7 +114,7 @@ def _(mo):
 
     )
 
- 
+
 
     controls = mo.vstack([
 
@@ -163,68 +131,40 @@ def _(mo):
     ])
 
     controls
-
     return (
-
         amort_change_slider,
-
         amort_excess_checkbox,
-
         amortization_slider,
-
         commercial_change_slider,
-
         fee_change_slider,
-
         interest_rate_slider,
-
         other_costs_slider,
-
         tomtratt_slider,
-
     )
 
- 
-
- 
 
 @app.cell(hide_code=True)
-
 def _(
-
     amort_change_slider,
-
     amort_excess_checkbox,
-
     amortization_slider,
-
     commercial_change_slider,
-
     fee_change_slider,
-
     go,
-
     interest_rate_slider,
-
     mo,
-
     other_costs_slider,
-
     pd,
-
     px,
-
     tomtratt_slider,
-
 ):
-
     # === Base data from 2025 annual report ===
 
     TOTAL_AREA = 1_359  # m² total
 
     BOSTADSYTA = 1_151  # m² bostadsrätt
 
- 
+
 
     # 2025 values
 
@@ -248,7 +188,7 @@ def _(
 
     base_amort = 500_000
 
- 
+
 
     # Apartment sizes
 
@@ -264,7 +204,7 @@ def _(
 
     ]
 
- 
+
 
     # Slider values
 
@@ -284,7 +224,7 @@ def _(
 
     amort_excess = amort_excess_checkbox.value
 
- 
+
 
     # === Simulation ===
 
@@ -294,7 +234,7 @@ def _(
 
     running_debt = base_skuld
 
- 
+
 
     for i, year in enumerate(years):
 
@@ -306,7 +246,7 @@ def _(
 
         fastighetsskatt = base_fastighetsskatt_vidare  # roughly constant
 
- 
+
 
         # --- Tomträttsavgäld with 5-year ladder from 2031 ---
 
@@ -324,13 +264,13 @@ def _(
 
             tomtratt = base_tomtratt + (new_tomtratt - base_tomtratt) * (step / 5)
 
- 
+
 
         # --- Debt & interest ---
 
         ranta = running_debt * interest_rate
 
- 
+
 
         # --- Other costs (grow ~2%/year) ---
 
@@ -340,7 +280,7 @@ def _(
 
         avskrivningar = base_avskrivningar  # constant
 
- 
+
 
         # --- Totals ---
 
@@ -348,7 +288,7 @@ def _(
 
         total_kostnader = tomtratt + drift_ovrig + ovriga_ext + avskrivningar + ranta
 
- 
+
 
         # --- Amortization ---
 
@@ -368,7 +308,7 @@ def _(
 
         running_debt = max(0, running_debt - amort_this_year)
 
- 
+
 
         rows.append({
 
@@ -400,11 +340,11 @@ def _(
 
         })
 
- 
+
 
     df = pd.DataFrame(rows)
 
- 
+
 
     # === Per sqm chart data ===
 
@@ -416,11 +356,11 @@ def _(
 
         df_chart[col] = df_chart[col] / TOTAL_AREA
 
- 
+
 
     df_melted = df_chart.melt(id_vars="År", var_name="Kostnadspost", value_name="kr/m²")
 
- 
+
 
     fig = px.bar(
 
@@ -454,7 +394,7 @@ def _(
 
     fig.update_layout(xaxis=dict(dtick=1))
 
- 
+
 
     # Income line
 
@@ -472,7 +412,7 @@ def _(
 
     ))
 
- 
+
 
     # === Apartment fee table ===
 
@@ -498,7 +438,7 @@ def _(
 
             })
 
- 
+
 
     df_fees = pd.DataFrame(fee_rows)
 
@@ -508,7 +448,7 @@ def _(
 
     df_fees_pivot = df_fees_pivot.loc[["1 rok", "2 rok", "3 rok", "4 rok"]]
 
- 
+
 
     # === Loan per m² table ===
 
@@ -522,7 +462,7 @@ def _(
 
     df_loan_display = df_loan[["År", "Skuld", "Lån/m² (totalyta)", "Lån/m² (bostadsyta)"]]
 
- 
+
 
     # === Display ===
 
@@ -545,13 +485,13 @@ def _(
         mo.ui.table(df[["År", "Totala intäkter", "Tomträttsavgäld", "Räntekostnader", "Skuld", "Resultat"]].round(0)),
 
     ])
-
     return
 
- 
 
- 
+@app.cell
+def _():
+    return
+
 
 if __name__ == "__main__":
-
     app.run()
